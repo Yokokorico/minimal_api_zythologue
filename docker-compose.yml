@@ -37,7 +37,18 @@ services:
         target: /pgpass
     networks:
       - zythologue
-
+  backend:
+      build:
+        context: ./ # Replace this with the path to your Spring Boot app directory
+        dockerfile: Docker/dev/api/Dockerfile # Replace this with the path to your Spring Boot app's Dockerfile
+      ports:
+        - "8080:8080"
+      environment:
+        - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/zythologue
+        - SPRING_DATASOURCE_USERNAME=postgres
+        - SPRING_DATASOURCE_PASSWORD=postgres
+      depends_on:
+        - db
 configs:
   pgpass:
     content: db:5432:*:yokoko:motdepasse

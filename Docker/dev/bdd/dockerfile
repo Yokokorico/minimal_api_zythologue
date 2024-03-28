@@ -1,0 +1,7 @@
+FROM postgres:latest
+
+
+# Copier le fichier d'initialisation dans le conteneur
+COPY ../../../zythologue_TD/init.sql /docker-entrypoint-initdb.d/
+COPY ../../../zythologue_TD/insert.sql /docker-entrypoint-initdb.d/
+COPY ../../../zythologue_TD/user.sql /docker-entrypoint-initdb.d/

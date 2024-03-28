@@ -1,0 +1,7 @@
+FROM postgres:latest
+
+
+# Copier le fichier d'initialisation dans le conteneur
+COPY init.sql /docker-entrypoint-initdb.d/
+COPY insert.sql /docker-entrypoint-initdb.d/
+COPY user.sql /docker-entrypoint-initdb.d/

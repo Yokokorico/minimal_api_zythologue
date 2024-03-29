@@ -11,10 +11,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -81,5 +84,22 @@ public class BeerController {
             beer.getBrewery(),
             beer.getCategory());
     }
+
+    @PutMapping("beer/{id}")
+    public void updateBeer(@PathVariable int id, @RequestBody BeerDTO beer) {
+        jdbcTemplate.update(
+            "UPDATE beer SET zyb_name = ?, zyb_description = ?, zyb_abv = ?, zyb_brewery = ?, zyb_category = ? WHERE zyb_id = ?",
+            beer.getName(),
+            beer.getDescription(),
+            beer.getAbv(),
+            beer.getBrewery(),
+            beer.getCategory(),
+            id
+        );
+    }
     
+    @DeleteMapping("beer/{id}")
+    public void deleteBeer(@PathVariable int id) {
+        jdbcTemplate.update("DELETE FROM beer WHERE zyb_id = ?", id);
+    }
 }

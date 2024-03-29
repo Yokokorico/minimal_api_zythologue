@@ -1,17 +1,10 @@
-# Utiliser l'image OpenJDK 21 comme base
+FROM jelastic/maven:3.9.5-openjdk-21 AS build
+COPY ../../../minimal_api/ /app
+WORKDIR /app
+RUN mvn clean && mvn package
+
+
 FROM openjdk:21
-
-# Définir le répertoire de travail dans le conteneur
-VOLUME /tmp
-
-# Exposer le port 8080
+COPY --from=build /app/target/minimal_api-0.0.1-SNAPSHOT.jar /app.jar
 EXPOSE 8080
-
-# Définir l'argument pour le fichier JAR
-ARG JAR_FILE=../../../minimal_api/target/minimal_api-0.0.1-SNAPSHOT.jar
-
-# Ajouter le fichier JAR dans le conteneur
-ADD ${JAR_FILE} app.jar
-
-# Définir la commande d'entrée pour exécuter l'application Spring Boot
 ENTRYPOINT ["java","-jar","/app.jar"]

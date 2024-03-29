@@ -1,4 +1,4 @@
-package com.zythologue.minimal_api;
+package com.zythologue.minimal_api.Model;
 
 public class BeerDTO {
     public String name;

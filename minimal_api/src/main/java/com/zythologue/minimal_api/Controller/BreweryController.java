@@ -25,17 +25,14 @@ public class BreweryController {
     public List<BreweryDTO> getAllBrewery() {
         String sql = "SELECT * FROM Brewery";
 
-        List<BreweryDTO> brewerys = jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> {
-                    BreweryDTO brewery = new BreweryDTO();
-                    brewery.setName(rs.getString("zybr_name"));
-                    brewery.setCountry(rs.getString("zybr_country"));
-                    brewery.setWebsite(rs.getString("zybr_website"));
+        List<BreweryDTO> brewerys = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            BreweryDTO brewery = new BreweryDTO();
+            brewery.setName(rs.getString("zybr_name"));
+            brewery.setCountry(rs.getString("zybr_country"));
+            brewery.setWebsite(rs.getString("zybr_website"));
 
-                    return brewery;
-                });
-
+            return brewery;
+        });
         return brewerys;
     }
 
@@ -43,40 +40,28 @@ public class BreweryController {
     public List<BreweryDTO> getOneBrewery(@PathVariable int id) {
         String sql = "SELECT zybr_name, zybr_country, zybr_website FROM Brewery WHERE zybr_id = ?";
 
-        List<BreweryDTO> brewery = jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> {
-                    BreweryDTO breweryQuery = new BreweryDTO();
-                    breweryQuery.setName(rs.getString("zybr_name"));
-                    breweryQuery.setCountry(rs.getString("zybr_country"));
-                    breweryQuery.setWebsite(rs.getString("zybr_website"));
-                    return breweryQuery;
-                },
-                id);
+        List<BreweryDTO> brewery = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            BreweryDTO breweryQuery = new BreweryDTO();
+            breweryQuery.setName(rs.getString("zybr_name"));
+            breweryQuery.setCountry(rs.getString("zybr_country"));
+            breweryQuery.setWebsite(rs.getString("zybr_website"));
+            return breweryQuery;
+        }, id);
         return brewery;
     }
 
     @PostMapping("/brewery")
     public void insertBrewery(@RequestBody BreweryDTO breweryDTO) {
-        jdbcTemplate.update(
-            "INSERT INTO brewery (zybr_name, zybr_country, zybr_website) VALUES (?, ?, ?)",
-            breweryDTO.getName(),
-            breweryDTO.getCountry(),
-            breweryDTO.getWebsite()
-        );
+        jdbcTemplate.update("INSERT INTO brewery (zybr_name, zybr_country, zybr_website) VALUES (?, ?, ?)",
+                breweryDTO.getName(), breweryDTO.getCountry(), breweryDTO.getWebsite());
     }
 
     @PutMapping("brewery/{id}")
     public void updateBrewery(@PathVariable int id, @RequestBody BreweryDTO breweryDTO) {
-        jdbcTemplate.update(
-            "UPDATE brewery SET zybr_name = ?, zybr_country = ?, zybr_website = ? WHERE zybr_id = ?",
-            breweryDTO.getName(),
-            breweryDTO.getCountry(),
-            breweryDTO.getWebsite(),
-            id
-        );
+        jdbcTemplate.update("UPDATE brewery SET zybr_name = ?, zybr_country = ?, zybr_website = ? WHERE zybr_id = ?",
+                breweryDTO.getName(), breweryDTO.getCountry(), breweryDTO.getWebsite(), id);
     }
-    
+
     @DeleteMapping("brewery/{id}")
     public void deleteBeer(@PathVariable int id) {
         jdbcTemplate.update("DELETE FROM brewery WHERE zybr_id = ?", id);

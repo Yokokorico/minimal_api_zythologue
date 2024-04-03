@@ -49,6 +49,10 @@ services:
         - SPRING_DATASOURCE_PASSWORD=postgres
       depends_on:
         - db
+      develop:
+        watch:
+          - action: rebuild
+            path: ./minimal_api
 configs:
   pgpass:
     content: db:5432:*:yokoko:motdepasse

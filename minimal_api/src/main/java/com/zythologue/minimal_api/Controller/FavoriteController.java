@@ -3,6 +3,8 @@ package com.zythologue.minimal_api.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,62 +20,110 @@ import com.zythologue.minimal_api.Model.FavoriteDTO;
 
 @RestController
 public class FavoriteController {
-	@Autowired
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping("/favorites")
-    public List<Favorite> getAllFavorites() {
-        String sql = "SELECT * FROM favorite";
+    public ResponseEntity<?> getAllFavorites() {
+        try {
+            String sql = "SELECT * FROM favorite";
 
-        List<Favorite> favorites = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            Favorite favorite = new Favorite();
-			favorite.setUserId(rs.getInt("zyf_user"));
-			favorite.setBeerId(rs.getInt("zyf_beer"));
-			favorite.setCreated(rs.getTimestamp("zyf_created_at"));
-			favorite.setUpdated(rs.getTimestamp("zyf_updated_at"));
-            return favorite;
-        });
+            List<Favorite> favorites = jdbcTemplate.query(sql, (rs, rowNum) -> {
+                Favorite favorite = new Favorite();
+                favorite.setUserId(rs.getInt("zyf_user"));
+                favorite.setBeerId(rs.getInt("zyf_beer"));
+                favorite.setCreated(rs.getTimestamp("zyf_created_at"));
+                favorite.setUpdated(rs.getTimestamp("zyf_updated_at"));
+                return favorite;
+            });
 
-        return favorites;
+            return ResponseEntity.ok(favorites);
+        }
+        catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de la récupération des favoris.");
+        }
     }
 
     @GetMapping("/favorite/{id}")
-    public ResponseEntity<List<FavoriteDTO>> getFavoriteByUserId(@PathVariable
+    public ResponseEntity<?> getFavoriteByUserId(@PathVariable
     int id) {
-        String sql = "SELECT zyf_user,zyf_beer FROM favorite WHERE zyf_user = ?";
+        try {
+            String sql = "SELECT zyf_user, zyf_beer FROM favorite WHERE zyf_user = ?";
 
-        List<FavoriteDTO> favorites = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            FavoriteDTO favoriteDTO = new FavoriteDTO();
-			favoriteDTO.setUserId(rs.getInt("zyf_user"));
-			favoriteDTO.setBeerId(rs.getInt("zyf_beer"));
-            return favoriteDTO;
-        }, id);
+            List<FavoriteDTO> favorites = jdbcTemplate.query(sql, (rs, rowNum) -> {
+                FavoriteDTO favoriteDTO = new FavoriteDTO();
+                favoriteDTO.setUserId(rs.getInt("zyf_user"));
+                favoriteDTO.setBeerId(rs.getInt("zyf_beer"));
+                return favoriteDTO;
+            }, id);
 
-        if(favorites.size() == 0) {
-            return ResponseEntity.notFound().build();
+            if (favorites.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(favorites);
         }
-        return ResponseEntity.ok(favorites);
+        catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de la récupération des favoris.");
+        }
     }
 
     @PostMapping("/favorite")
-    public void updateFavorite(@RequestBody
+    public ResponseEntity<String> insertFavorite(@RequestBody
     FavoriteDTO favorite) {
-        jdbcTemplate.update(
-                "INSERT INTO favorite (zyf_user,zyf_beer) VALUES (?, ?)", favorite.getUserId(), favorite.getBeerId()
-                );
+        try {
+            jdbcTemplate.update("INSERT INTO favorite (zyf_user, zyf_beer) VALUES (?, ?)", favorite.getUserId(),
+                    favorite.getBeerId());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Favori inséré avec succès.");
+        }
+        catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de l'insertion du favori.");
+        }
     }
 
     @PutMapping("favorite/{id}")
-    public void updateFavorite(@PathVariable
+    public ResponseEntity<String> updateFavorite(@PathVariable
     int id, @RequestBody
     FavoriteDTO favorite) {
-        jdbcTemplate.update(
-                "UPDATE favorite SET zyf_user = ?, zyf_beer = ? WHERE zyf_user = ?", favorite.getUserId(), favorite.getBeerId(), id);
+        try {
+            int rowsUpdated = jdbcTemplate.update("UPDATE favorite SET zyf_user = ?, zyf_beer = ? WHERE zyf_user = ?",
+                    favorite.getUserId(), favorite.getBeerId(), id);
+
+            if (rowsUpdated > 0) {
+                return ResponseEntity.ok("Favoris de l'utilisateur mis à jour avec succès.");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Aucun favori trouvé pour l'utilisateur avec l'ID spécifié.");
+            }
+        }
+        catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de la mise à jour des favoris de l'utilisateur.");
+        }
     }
 
     @DeleteMapping("favorite/{id}")
-    public void DeleteFavorite(@PathVariable
+    public ResponseEntity<String> deleteFavoritesByUserId(@PathVariable
     int id) {
-        jdbcTemplate.update("DELETE FROM favorite WHERE zyf_user = ?", id);
+        try {
+            int rowsDeleted = jdbcTemplate.update("DELETE FROM favorite WHERE zyf_user = ?", id);
+
+            if (rowsDeleted > 0) {
+                return ResponseEntity.ok("Favoris de l'utilisateur supprimés avec succès.");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Aucun favori trouvé pour l'utilisateur avec l'ID spécifié.");
+            }
+        }
+        catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de la suppression des favoris de l'utilisateur.");
+        }
     }
+
 }

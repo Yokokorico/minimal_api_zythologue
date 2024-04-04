@@ -17,13 +17,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zythologue.minimal_api.Model.IngredientDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
+@Tag(name = "Ingredient", description = "Manage ingredients")
 public class IngredientController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping("/ingredients")
+    @Operation(summary = "Get all ingredients", description = "Returns a list of all ingredients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingredients found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = IngredientDTO.class)),
+            })
+            , @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getAllIngredients() {
         try {
             String sql = "SELECT * FROM ingredient";
@@ -43,7 +60,17 @@ public class IngredientController {
         }
     }
 
-    @GetMapping("/ingredient/{id}")
+    @GetMapping("/ingredients/{id}")
+    @Operation(summary = "Get ingredient by id", description = "Returns an ingredient by id", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the ingredient", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingredient found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = IngredientDTO.class)),
+            })
+            , @ApiResponse(responseCode = "404", description = "Ingredient not found")
+            , @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getIngredientById(@PathVariable
     int id) {
         try {
@@ -68,7 +95,12 @@ public class IngredientController {
         }
     }
 
-    @PostMapping("/ingredient")
+    @PostMapping("/ingredients")
+    @Operation(summary = "Add ingredient", description = "Adds an ingredient")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Ingredient added successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> addIngredient(@RequestBody
     IngredientDTO ingredient) {
         try {
@@ -82,7 +114,15 @@ public class IngredientController {
         }
     }
 
-    @PutMapping("ingredient/{id}")
+    @PutMapping("ingredients/{id}")
+    @Operation(summary = "Update ingredient", description = "Updates an ingredient", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the ingredient", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingredient updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Ingredient not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> updateIngredient(@PathVariable
     int id, @RequestBody
     IngredientDTO ingredient) {
@@ -103,7 +143,15 @@ public class IngredientController {
         }
     }
 
-    @DeleteMapping("ingredient/{id}")
+    @DeleteMapping("ingredients/{id}")
+    @Operation(summary = "Delete ingredient", description = "Deletes an ingredient", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the ingredient", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ingredient deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Ingredient not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> deleteIngredient(@PathVariable
     int id) {
         try {

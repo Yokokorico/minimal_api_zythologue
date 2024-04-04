@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,13 @@ import com.zythologue.minimal_api.Model.BreweryDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
+@Tag(name = "Brewery", description = "Brewery Operations")
 public class BreweryController {
 
     @Autowired
@@ -71,6 +75,18 @@ public class BreweryController {
     }
 
     @GetMapping("brewery/{id}")
+    @Operation(summary = "Get Brewery By Id", description = "Returns a single brewery", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the brewery", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(), mediaType = "application/json")
+            }), @ApiResponse(responseCode = "404", content = {
+                    @Content(schema = @Schema())
+            }), @ApiResponse(responseCode = "500", content = {
+                    @Content(schema = @Schema())
+            })
+    })
     public ResponseEntity<?> getOneBrewery(@PathVariable
     int id) {
         try {
@@ -101,6 +117,14 @@ public class BreweryController {
     }
 
     @PostMapping("/brewery")
+    @Operation(summary = "Insert Brewery", description = "Inserts a new brewery")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", content = {
+                    @Content(schema = @Schema(), mediaType = "application/json")
+            }), @ApiResponse(responseCode = "500", content = {
+                    @Content(schema = @Schema())
+            })
+    })
     public ResponseEntity<String> insertBrewery(@RequestBody
     BreweryDTO breweryDTO) {
         try {
@@ -115,6 +139,18 @@ public class BreweryController {
     }
 
     @PutMapping("brewery/{id}")
+    @Operation(summary = "Update Brewery", description = "Updates an existing brewery", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the brewery", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(), mediaType = "application/json")
+            }), @ApiResponse(responseCode = "404", content = {
+                    @Content(schema = @Schema())
+            }), @ApiResponse(responseCode = "500", content = {
+                    @Content(schema = @Schema())
+            })
+    })
     public ResponseEntity<String> updateBrewery(@PathVariable
     int id, @RequestBody
     BreweryDTO breweryDTO) {
@@ -137,6 +173,18 @@ public class BreweryController {
     }
 
     @DeleteMapping("brewery/{id}")
+    @Operation(summary = "Delete Brewery", description = "Deletes an existing brewery", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the brewery", required = true)  
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(), mediaType = "application/json")
+            }), @ApiResponse(responseCode = "404", content = {
+                    @Content(schema = @Schema())
+            }), @ApiResponse(responseCode = "500", content = {
+                    @Content(schema = @Schema())
+            })
+    })
     public ResponseEntity<String> deleteBrewery(@PathVariable
     int id) {
         try {

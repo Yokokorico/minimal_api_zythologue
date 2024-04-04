@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zythologue.minimal_api.Model.BeerDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
-@Tag(name = "Beer", description = "Beer Controller")
+@Tag(name = "Beers", description = "API for managing Beers")
 public class BeerController {
 
     @Autowired
@@ -34,7 +36,7 @@ public class BeerController {
 
     @GetMapping("/beers")
     @Operation(summary = "Get All Beers", description = "Returns a list of all beers")
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(), mediaType = "application/json")
             }), @ApiResponse(responseCode = "404", content = {
@@ -75,15 +77,13 @@ public class BeerController {
     }
 
     @GetMapping("/beers/{id}")
-    @Operation(summary = "Get Beer By Id", description = "Returns a single beer")
+    @Operation(summary = "Get Beer By Id", description = "Returns a single beer", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the beer", required = true)
+    })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(), mediaType = "application/json")
-            }), @ApiResponse(responseCode = "404", content = {
-                    @Content(schema = @Schema())
-            }), @ApiResponse(responseCode = "500", content = {
-                    @Content(schema = @Schema())
-            })
+            }), @ApiResponse(responseCode = "404"), @ApiResponse(responseCode = "500")
     })
     public ResponseEntity<BeerDTO> getBeerById(@PathVariable
     int id) {
@@ -122,9 +122,7 @@ public class BeerController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(), mediaType = "application/json")
-            }), @ApiResponse(responseCode = "500", content = {
-                    @Content(schema = @Schema())
-            })
+            }), @ApiResponse(responseCode = "500")
     })
     public ResponseEntity<Void> createBeer(@RequestBody
     BeerDTO beer) {
@@ -142,13 +140,13 @@ public class BeerController {
     }
 
     @PutMapping("beers/{id}")
-    @Operation(summary = "Update Beer", description = "Updates an existing beer")
+    @Operation(summary = "Update Beer", description = "Updates an existing beer", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the beer", required = true)
+    })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(), mediaType = "application/json")
-            }), @ApiResponse(responseCode = "500", content = {
-                    @Content(schema = @Schema())
-            })
+            }), @ApiResponse(responseCode = "500")
     })
     public ResponseEntity<Void> updateBeer(@PathVariable
     int id, @RequestBody
@@ -172,13 +170,13 @@ public class BeerController {
     }
 
     @DeleteMapping("beers/{id}")
-    @Operation(summary = "Delete Beer", description = "Deletes an existing beer")
+    @Operation(summary = "Delete Beer", description = "Deletes an existing beer", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", description = "The id of the beer", required = true)
+    })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(), mediaType = "application/json")
-            }), @ApiResponse(responseCode = "500", content = {
-                    @Content(schema = @Schema())
-            })
+            }), @ApiResponse(responseCode = "500")
     })
     public ResponseEntity<?> deleteBeer(@PathVariable
     int id) {

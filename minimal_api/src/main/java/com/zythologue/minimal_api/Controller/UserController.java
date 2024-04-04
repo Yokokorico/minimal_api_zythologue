@@ -17,12 +17,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zythologue.minimal_api.Model.UserDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+
 @RestController
+@Tag(name = "User", description = "User management API")
 public class UserController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping("/users")
+    @Operation(summary = "Get all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     public ResponseEntity<?> getAllUsers() {
         try {
             String sql = "SELECT * FROM \"User\"";
@@ -43,7 +58,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
+    @Operation(summary = "Get user by id", description = "Retrieves user by id", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<?> getUserById(@PathVariable
     int id) {
         try {
@@ -69,7 +92,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/user")
+    @PostMapping("/users")
+    @Operation(summary = "Add user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User added successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> addUser(@RequestBody
     UserDTO user) {
         try {
@@ -83,7 +111,15 @@ public class UserController {
         }
     }
 
-    @PutMapping("user/{id}")
+    @PutMapping("users/{id}")
+    @Operation(summary = "Update user", description = "Updates user by id", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User updated successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> updateUser(@PathVariable
     int id, @RequestBody
     UserDTO user) {
@@ -105,7 +141,15 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("user/{id}")
+    @DeleteMapping("users/{id}")
+    @Operation(summary = "Delete user", description = "Deletes user by id", parameters = {
+            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> deleteUser(@PathVariable
     int id) {
         try {

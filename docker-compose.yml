@@ -53,6 +53,8 @@ services:
         watch:
           - action: rebuild
             path: ./minimal_api
+      networks:
+        - zythologue
 configs:
   pgpass:
     content: db:5432:*:yokoko:motdepasse
